@@ -1,31 +1,55 @@
 import { useState, useMemo } from 'react'; // React hooks for managing state and memoizing values.
 import { SearchBar } from '../components/SearchBar'; // Component for searching icons.
+import { FilterBar } from '../components/FilterBar'; // Component for filtering icons by market data.
 import { Stats } from '../components/Stats'; // Component for displaying icon statistics.
 import { IconCard } from '../components/IconCard'; // Component for displaying individual icons.
 import { PreviewModal } from '../components/PreviewModal'; // Modal for icon preview.
 import { ToastContainer } from '../components/Toast'; // Container for toast notifications.
 import { useCryptoIcons } from '../hooks/useCryptoIcons'; // Custom hook for fetching crypto icon data.
+import { useMarketData } from '../hooks/useMarketData'; // Custom hook for fetching market cap data.
 import { useToast } from '../hooks/useToast'; // Custom hook for managing toast notifications.
 import { CryptoIcon } from '../types'; // Type definition for cryptocurrency icons.
 import { Loader2 } from 'lucide-react'; // Icon component for displaying loading animations.
 
 export default function HomePage() { // Main component for the cryptocurrency icon application.
   const { icons, loading, error } = useCryptoIcons();
+  const { marketData, loading: marketLoading, isTop100Coin, isActiveCoin } = useMarketData();
   const { toasts, addToast, removeToast } = useToast(); // Manages toast notifications for user feedback.
   const [searchQuery, setSearchQuery] = useState(''); // State for the search input value.
   const [selectedIcon, setSelectedIcon] = useState<CryptoIcon | null>(null); // Stores the icon selected for preview.
   const [isModalOpen, setIsModalOpen] = useState(false); // Controls the visibility of the preview modal.
+  const [showTop100Only, setShowTop100Only] = useState(false); // Filter to show only top 100 coins by market cap.
+  const [showActiveOnly, setShowActiveOnly] = useState(true); // Filter to show only active coins (default: true).
 
-  const filteredIcons = useMemo(() => { // Memoized list of icons based on search query.
-    if (!searchQuery.trim()) return icons;
-    
-    const query = searchQuery.toLowerCase();
-    return icons.filter(icon =>
-      icon.displayName.toLowerCase().includes(query) ||
-      icon.name.toLowerCase().includes(query) ||
-      icon.symbol?.toLowerCase().includes(query)
-    );
-  }, [icons, searchQuery]);
+  const filteredIcons = useMemo(() => { // Memoized list of icons based on search query and filters.
+    let filtered = icons;
+
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(icon =>
+        icon.displayName.toLowerCase().includes(query) ||
+        icon.name.toLowerCase().includes(query) ||
+        icon.symbol?.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply Top 100 filter
+    if (showTop100Only && marketData) {
+      filtered = filtered.filter(icon =>
+        icon.symbol && isTop100Coin(icon.symbol)
+      );
+    }
+
+    // Apply Active coins filter
+    if (showActiveOnly && marketData) {
+      filtered = filtered.filter(icon =>
+        icon.symbol && isActiveCoin(icon.symbol)
+      );
+    }
+
+    return filtered;
+  }, [icons, searchQuery, showTop100Only, showActiveOnly, marketData, isTop100Coin, isActiveCoin]);
 
   const handleCopy = async (content: string, name: string) => { // Handles copying icon SVG to clipboard.
       await navigator.clipboard.writeText(content);
@@ -91,6 +115,15 @@ export default function HomePage() { // Main component for the cryptocurrency ic
             />
           </div>
         </div>
+
+        {/* Filter Bar */}
+        <FilterBar
+          showTop100Only={showTop100Only}
+          onToggleTop100={() => setShowTop100Only(!showTop100Only)}
+          showActiveOnly={showActiveOnly}
+          onToggleActive={() => setShowActiveOnly(!showActiveOnly)}
+          isLoading={marketLoading}
+        />
 
         {/* Stats */}
         <Stats // Displays statistics about the total and filtered icons.
