@@ -6,7 +6,7 @@ import path from 'path';
 let cachedActiveCoins: Set<string> | null = null;
 let cacheTimestamp: number = 0;
 
-const CACHE_DURATION = parseInt(process.env.CMC_CACHE_DURATION || '86400000'); // 24 hours
+const CACHE_DURATION = parseInt(process.env.CMC_ACTIVE_COINS_CACHE_DURATION || '604800000'); // 7 days default
 const BATCH_SIZE = 100; // Check 100 symbols per API call
 
 interface ActiveCoinsData {
