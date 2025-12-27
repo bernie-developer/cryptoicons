@@ -142,8 +142,11 @@ export default async function handler(
 
       // Add active symbols from this batch
       if (data.data && Array.isArray(data.data)) {
-        console.log(`Batch ${apiCallsMade}: Found ${data.data.length} active coins`);
-        data.data.forEach((coin: any) => {
+        // Filter for coins that are actually active (is_active: 1)
+        const activeCoins = data.data.filter((coin: any) => coin.is_active === 1);
+        console.log(`Batch ${apiCallsMade}: Found ${activeCoins.length} active coins (out of ${data.data.length} total)`);
+
+        activeCoins.forEach((coin: any) => {
           if (coin.symbol) {
             activeSymbols.add(coin.symbol.toUpperCase());
           }
