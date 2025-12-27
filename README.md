@@ -26,7 +26,7 @@ This application comes packed with a variety of features to enhance the user exp
 *   **Search Functionality**: Easily find icons by name or symbol using a responsive search bar with sticky positioning. This greatly improves icon discovery.
 *   **Smart Filtering**: Filter coins by market data:
     *   **Top 100 Only**: Show only the top 100 cryptocurrencies by market cap
-    *   **Active Only**: Display only actively traded cryptocurrencies (534+ coins verified via CoinMarketCap)
+    *   **Active Only**: Display only actively traded cryptocurrencies (verified via CoinMarketCap)
 *   **Icon Preview**: View a larger version of each icon for detailed inspection. This allows users to see the details before downloading.
 *   **Copy SVG Code**: Quickly copy the SVG code of any icon to your clipboard for direct use in projects. This streamlines the integration process.
 *   **Download Icons**: Download individual SVG icon files. This offers flexibility for offline use or custom modifications.
@@ -81,10 +81,10 @@ The filtering features work out of the box with pre-generated data. However, if 
     ```
 
     This script will:
-    *   Check all 821 cryptocurrency symbols from the icon library
+    *   Check all cryptocurrency symbols from the icon library
     *   Query CoinMarketCap API to verify which coins are actively traded
     *   Generate updated JSON files in `/public/data/`
-    *   Take approximately 5-10 minutes to complete
+    *   Take approximately 5-10 minutes to complete (depending on library size)
 
 **Note**: The app works perfectly without an API key. Filter features will use the pre-generated static data files.
 
@@ -96,11 +96,11 @@ The filtering features work out of the box with pre-generated data. However, if 
 *   `pages/api/`: API routes for data fetching:
     *   `coinmarketcap/top100.ts`: Fetches top 100 coins by market cap (with 24h cache)
     *   `active-coins.ts`: Serves pre-generated active coins data
-*   `public/icons/`: Directory containing all 821 SVG cryptocurrency icon files.
+*   `public/icons/`: Directory containing SVG cryptocurrency icon files.
 *   `public/data/`: Static JSON files for filtering:
-    *   `active-coins.json`: List of actively traded cryptocurrencies (534 coins)
+    *   `active-coins.json`: List of actively traded cryptocurrencies
     *   `inactive-coins.json`: Inactive or unknown coins
-    *   `all-coins.json`: Complete list of all symbols
+    *   `all-coins.json`: Complete list of all symbols from the icon library
 *   `scripts/`: Maintenance scripts:
     *   `update-active-coins.cjs`: Updates active coins data from CoinMarketCap API
 *   `styles/`: Global styles and Tailwind CSS configuration.
