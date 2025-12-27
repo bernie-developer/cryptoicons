@@ -7,7 +7,7 @@ let cachedActiveCoins: Set<string> | null = null;
 let cacheTimestamp: number = 0;
 
 const CACHE_DURATION = parseInt(process.env.CMC_ACTIVE_COINS_CACHE_DURATION || '604800000'); // 7 days default
-const BATCH_SIZE = 100; // Check 100 symbols per API call
+const BATCH_SIZE = 10; // Check 10 symbols per API call (CoinMarketCap limit)
 
 interface ActiveCoinsData {
   activeSymbols: string[];
@@ -129,7 +129,13 @@ export default async function handler(
       apiCallsMade++;
 
       if (!response.ok) {
-        console.error(`CoinMarketCap API error for batch: ${response.status}`);
+        const errorText = await response.text();
+        console.error(`CoinMarketCap API error for batch ${apiCallsMade}:`, {
+          status: response.status,
+          statusText: response.statusText,
+          symbols: batch.join(','),
+          error: errorText.substring(0, 200)
+        });
         continue; // Skip failed batches
       }
 
