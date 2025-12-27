@@ -105,11 +105,45 @@ async function updateActiveCoins() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`   ❌ Error ${response.status}: ${errorText.substring(0, 100)}`);
+        console.error(`   ❌ Batch failed ${response.status}: Retrying individually...`);
         failedCalls++;
 
-        // Add to inactive if API call failed (assume inactive)
-        batch.forEach(symbol => inactiveSymbols.add(symbol));
+        // Retry each symbol individually
+        for (const symbol of batch) {
+          try {
+            await sleep(DELAY_MS);
+            const singleResponse = await fetch(
+              `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=${symbol}&listing_status=active`,
+              {
+                headers: {
+                  'X-CMC_PRO_API_KEY': API_KEY,
+                  'Accept': 'application/json',
+                },
+              }
+            );
+
+            if (singleResponse.ok) {
+              const singleData = await singleResponse.json();
+              if (singleData.data && Array.isArray(singleData.data)) {
+                const activeCoins = singleData.data.filter(coin => coin.is_active === 1);
+                if (activeCoins.length > 0) {
+                  activeSymbols.add(symbol);
+                  console.log(`      ✅ ${symbol} is active`);
+                } else {
+                  inactiveSymbols.add(symbol);
+                }
+              } else {
+                inactiveSymbols.add(symbol);
+              }
+            } else {
+              inactiveSymbols.add(symbol);
+              console.log(`      ❌ ${symbol} failed/invalid`);
+            }
+          } catch (err) {
+            inactiveSymbols.add(symbol);
+            console.log(`      ❌ ${symbol} error: ${err.message}`);
+          }
+        }
       } else {
         const data = await response.json();
 
