@@ -36,16 +36,18 @@ export default function HomePage() { // Main component for the cryptocurrency ic
 
     // Apply Top 100 filter
     if (showTop100Only && marketData) {
-      filtered = filtered.filter(icon =>
-        icon.symbol && isTop100Coin(icon.symbol)
-      );
+      filtered = filtered.filter(icon => {
+        if (!icon.symbol) return false; // No symbol = can't verify if in top 100
+        return isTop100Coin(icon.symbol);
+      });
     }
 
     // Apply Active coins filter
     if (showActiveOnly && marketData) {
-      filtered = filtered.filter(icon =>
-        icon.symbol && isActiveCoin(icon.symbol)
-      );
+      filtered = filtered.filter(icon => {
+        if (!icon.symbol) return true; // No symbol = can't verify active status, so show it
+        return isActiveCoin(icon.symbol);
+      });
     }
 
     return filtered;

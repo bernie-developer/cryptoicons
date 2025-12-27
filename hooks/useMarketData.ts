@@ -81,9 +81,11 @@ export const useMarketData = (): UseMarketDataResult => {
       c => c.symbol.toUpperCase() === normalizedSymbol
     );
 
-    // If coin not in top 100, we don't have active status, so show it
+    // If coin not in top 100, we don't have active status data
+    // Show it by default (don't filter unknown coins)
     if (!coin) return true;
 
+    // For coins in top 100: only show if active
     return coin.is_active === 1;
   };
 
