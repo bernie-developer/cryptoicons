@@ -71,7 +71,6 @@ The filtering features work out of the box with pre-generated data. However, if 
     ```bash
     COINMARKETCAP_API_KEY=your_api_key_here
     CMC_CACHE_DURATION=86400000
-    CMC_ACTIVE_COINS_CACHE_DURATION=604800000
     ```
 
 3.  **Update active coins data** (optional, only when you want to refresh):
