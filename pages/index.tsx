@@ -13,7 +13,7 @@ import { Loader2 } from 'lucide-react'; // Icon component for displaying loading
 
 export default function HomePage() { // Main component for the cryptocurrency icon application.
   const { icons, loading, error } = useCryptoIcons();
-  const { marketData, loading: marketLoading, isTop100Coin, isActiveCoin } = useMarketData();
+  const { marketData, loading: marketLoading, isTop100Coin, isActiveCoin, apiKeyConfigured } = useMarketData();
   const { toasts, addToast, removeToast } = useToast(); // Manages toast notifications for user feedback.
   const [searchQuery, setSearchQuery] = useState(''); // State for the search input value.
   const [selectedIcon, setSelectedIcon] = useState<CryptoIcon | null>(null); // Stores the icon selected for preview.
@@ -123,6 +123,7 @@ export default function HomePage() { // Main component for the cryptocurrency ic
           showActiveOnly={showActiveOnly}
           onToggleActive={() => setShowActiveOnly(!showActiveOnly)}
           isLoading={marketLoading}
+          apiKeyConfigured={apiKeyConfigured}
         />
 
         {/* Stats */}

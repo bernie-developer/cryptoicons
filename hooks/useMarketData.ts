@@ -19,12 +19,14 @@ interface UseMarketDataResult {
   error: string | null;
   isTop100Coin: (symbol: string) => boolean;
   isActiveCoin: (symbol: string) => boolean;
+  apiKeyConfigured: boolean;
 }
 
 export const useMarketData = (): UseMarketDataResult => {
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [apiKeyConfigured, setApiKeyConfigured] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -38,11 +40,17 @@ export const useMarketData = (): UseMarketDataResult => {
         const result = await response.json();
 
         if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch market data');
+          if (result.error === 'API_KEY_NOT_CONFIGURED') {
+            setApiKeyConfigured(false);
+            setError(null); // No error message, just disabled features
+          } else {
+            throw new Error(result.error || 'Failed to fetch market data');
+          }
+        } else {
+          setMarketData(result.data);
+          setApiKeyConfigured(true);
+          setError(null);
         }
-
-        setMarketData(result.data);
-        setError(null);
       } catch (err) {
         console.error('Failed to load market data:', err);
         setError('Failed to load market data. Filter features may be limited.');
@@ -85,5 +93,6 @@ export const useMarketData = (): UseMarketDataResult => {
     error,
     isTop100Coin,
     isActiveCoin,
+    apiKeyConfigured,
   };
 };
